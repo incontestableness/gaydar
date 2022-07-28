@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script>
+			fetch("/gaydar/get_scenes")
+				.then(response => response.json())
+				.then(json => {
+					var scene_names = json["scenes"];
+					var selector = document.getElementById("scene_selector");
+					for (var i = 0; i < scene_names.length; i++) {
+						console.log(i);
+						var option = document.createElement("option");
+						option.text = scene_names[i];
+						selector.add(option);
+					}
+				}
+			);
+		</script>
+	</head>
+
+	<body>
+		<h1>Controller</h1>
+		<form action="/gaydar/set_color">
+			<input type="color" name="color" value="#ff0000" onchange="document.getElementById('save_color').value = this.value;">
+			<input type="submit" value="Set Color">
+		</form>
+		<form action="/gaydar/set_brightness">
+			<input type="range" name="brightness" min="0" max="254" value="254" onchange="document.getElementById('save_brightness').value = this.value;">
+			<input type="submit" value="Set Brightness">
+		</form>
+		<form action="/gaydar/toggle_lights">
+			<input type="submit" value="Toggle Lights">
+		</form>
+		<form action="/gaydar/load_scene">
+			<select id="scene_selector" name="scene_name"></select>
+			<input type="submit" value="Load Scene">
+		</form>
+		<form action="/gaydar/save_scene">
+			<input type="text" name="scene_name">
+			<input id="save_color" type="hidden" name="color" value="#ffffff">
+			<input id="save_brightness" type="hidden" name="brightness" value=254>
+			<input type="submit" value="Save Scene">
+		</form>
+	</body>
+</html>
