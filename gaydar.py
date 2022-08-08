@@ -31,6 +31,12 @@ no_content = ("", 204)
 # === Configuration ===
 
 
+# Target all devices configured in data/devices.yaml by default
+targets = ["all"]
+
+# The set topics to send payloads to
+set_targets = []
+
 # Network spaces that are allowed to control the lights
 network_whitelists = [
 	netaddr.IPNetwork("127.0.0.1/32"),
@@ -40,9 +46,7 @@ network_whitelists = [
 # Load groups/devices to target
 @app.before_first_request
 def reload_configuration():
-	app.set_targets = []
-	if not hasattr(app, "targets"):
-		app.targets = ["all"]
+	set_targets = []
 	with open("/opt/zigbee2mqtt/data/groups.yaml") as f:
 		groups = yaml.safe_load(f)
 	with open("/opt/zigbee2mqtt/data/devices.yaml") as f:
@@ -52,16 +56,16 @@ def reload_configuration():
 		# If the user configured a group with this name, ignore it
 		if group["friendly_name"] == "all":
 			break
-		if group["friendly_name"] in app.targets:
+		if group["friendly_name"] in targets:
 			for target in group["devices"]:
-				app.set_targets.append(f"zigbee2mqtt/{target}/set")
+				set_targets.append(f"zigbee2mqtt/{target}/set")
 	for device_number in devices:
 		device = devices[device_number]
-		if app.targets == ["all"]:
-			app.set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
-		elif device["friendly_name"] in app.targets:
-			app.set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
-	print(f"Set targets: {app.set_targets}")
+		if targets == ["all"]:
+			set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
+		elif device["friendly_name"] in targets:
+			set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
+	print(f"Set targets: {set_targets}")
 
 
 # === MQTT ===
@@ -90,7 +94,7 @@ def handle_mqtt_message(client, userdata, message):
 
 # Send the given payload to each target device
 def send(payload):
-	for set_target in app.set_targets:
+	for set_target in set_targets:
 		mqtt.publish(set_target, payload)
 
 
@@ -175,5 +179,5 @@ def save_scene():
 @app.route("/set_targets")
 @app.route("/gaydar/set_targets")
 def set_targets():
-	app.targets = request.args["targets"].split(",")
+	targets = request.args["targets"].split(",")
 	reload_configuration()
