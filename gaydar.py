@@ -32,10 +32,10 @@ no_content = ("", 204)
 
 
 # Target all devices configured in data/devices.yaml by default
-targets = ["all"]
+app.targets = ["all"]
 
 # The set topics to send payloads to
-set_targets = []
+app.set_targets = []
 
 # Network spaces that are allowed to control the lights
 network_whitelists = [
@@ -46,7 +46,7 @@ network_whitelists = [
 # Load groups/devices to target
 @app.before_first_request
 def reload_configuration():
-	set_targets = []
+	app.set_targets = []
 	with open("/opt/zigbee2mqtt/data/groups.yaml") as f:
 		groups = yaml.safe_load(f)
 	with open("/opt/zigbee2mqtt/data/devices.yaml") as f:
@@ -56,16 +56,16 @@ def reload_configuration():
 		# If the user configured a group with this name, ignore it
 		if group["friendly_name"] == "all":
 			break
-		if group["friendly_name"] in targets:
+		if group["friendly_name"] in app.targets:
 			for target in group["devices"]:
-				set_targets.append(f"zigbee2mqtt/{target}/set")
+				app.set_targets.append(f"zigbee2mqtt/{target}/set")
 	for device_number in devices:
 		device = devices[device_number]
-		if targets == ["all"]:
-			set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
-		elif device["friendly_name"] in targets:
-			set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
-	print(f"Set targets: {set_targets}")
+		if app.targets == ["all"]:
+			app.set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
+		elif device["friendly_name"] in app.targets:
+			app.set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
+	print(f"Set targets: {app.set_targets}")
 
 
 # === MQTT ===
@@ -94,7 +94,7 @@ def handle_mqtt_message(client, userdata, message):
 
 # Send the given payload to each target device
 def send(payload):
-	for set_target in set_targets:
+	for set_target in app.set_targets:
 		mqtt.publish(set_target, payload)
 
 
@@ -176,8 +176,9 @@ def save_scene():
 # === Target device control ===
 
 
-@app.route("/set_targets")
-@app.route("/gaydar/set_targets")
-def set_targets():
-	targets = request.args["targets"].split(",")
+@app.route("/set_target_names")
+@app.route("/gaydar/set_target_names")
+def set_target_names():
+	app.targets = request.args["targets"].split(",")
 	reload_configuration()
+	return no_content
