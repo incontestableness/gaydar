@@ -2,7 +2,7 @@
 
 set -e
 
-read -p "Press enter if you know what you're doing..."; echo
+read -p "Press enter if you know what you're doing..."
 
 echo -e "\nInstalling dependencies..."
 sudo apt install python3-pip apache2 libapache2-mod-wsgi-py3 -y
@@ -23,7 +23,7 @@ sudo chown -v www-data:www-data /var/www/html/gaydar.html
 # Make static content read-only
 sudo chmod -v 444 /var/www/html/gaydar.html
 
-echo -e "\nSetting up WSGI..."
+echo -e "\nConfiguring WSGI..."
 sudo cp -vr WSGI/* /etc/apache2/
 sudo a2ensite gaydar.conf
 sudo systemctl reload apache2

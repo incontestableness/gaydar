@@ -7,10 +7,13 @@ from flask_caching import Cache
 from flask_mqtt import Mqtt
 import json
 import netaddr
+import yaml
 
 
 
-# Declare our Flask instance and define all the API routes
+# === Declare our Flask instance ===
+
+
 app = Flask(__name__)
 config = {
 	"JSON_SORT_KEYS": False,
@@ -21,13 +24,54 @@ app.config.from_mapping(config)
 cache = Cache(app)
 mqtt = Mqtt(app)
 
+# We respond to most API requests with 204 No Content
+no_content = ("", 204)
+
+
+# === Configuration ===
+
+
+# Network spaces that are allowed to control the lights
+network_whitelists = [
+	netaddr.IPNetwork("127.0.0.1/32"),
+	netaddr.IPNetwork("192.168.1.0/24")
+]
+
+# Load groups/devices to target
+@app.before_first_request
+def reload_configuration():
+	app.set_targets = []
+	if not hasattr(app, "targets"):
+		app.targets = ["all"]
+	with open("/opt/zigbee2mqtt/data/groups.yaml") as f:
+		groups = yaml.safe_load(f)
+	with open("/opt/zigbee2mqtt/data/devices.yaml") as f:
+		devices = yaml.safe_load(f)
+	for group_number in groups:
+		group = groups[group_number]
+		# If the user configured a group with this name, ignore it
+		if group["friendly_name"] == "all":
+			break
+		if group["friendly_name"] in app.targets:
+			for target in group["devices"]:
+				app.set_targets.append(f"zigbee2mqtt/{target}/set")
+	for device_number in devices:
+		device = devices[device_number]
+		if app.targets == ["all"]:
+			app.set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
+		elif device["friendly_name"] in app.targets:
+			app.set_targets.append(f"zigbee2mqtt/{device['friendly_name']}/set")
+	print(f"Set targets: {app.set_targets}")
+
+
+# === MQTT ===
+
 
 @mqtt.on_connect()
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		print("MQTT client connected to broker!")
 		mqtt.subscribe("zigbee2mqtt/bridge/state")
-		mqtt.subscribe("zigbee2mqtt/bridge/event")
 		print("Subscribed!")
 	else:
 		print(f"Bad connection. Code: {rc}")
@@ -44,10 +88,14 @@ def handle_mqtt_message(client, userdata, message):
 	print(f"Received message on topic {message.topic}: {payload}")
 
 
-network_whitelists = [
-	netaddr.IPNetwork("127.0.0.1/32"),
-	netaddr.IPNetwork("192.168.1.0/24")
-]
+# Send the given payload to each target device
+def send(payload):
+	for set_target in app.set_targets:
+		mqtt.publish(set_target, payload)
+
+
+# === Flask routes ===
+
 
 @app.before_request
 def ensure_whitelisted():
@@ -71,17 +119,12 @@ def gaydar():
 	return send_from_directory("html", "gaydar.html")
 
 
-@app.route("/get_scenes")
-def get_scenes():
-	scenes = ["scene1", "scene2"]
-	return jsonify(scenes=scenes)
-
-
 @app.route("/set_color")
 @app.route("/gaydar/set_color")
 def set_color():
 	color:str = request.args["color"]
-	return "", 204
+	send(json.dumps({"color": {"hex": color}}))
+	return no_content
 
 
 @app.route("/set_brightness")
@@ -89,22 +132,32 @@ def set_color():
 def set_brightness():
 	brightness = int(request.args["brightness"])
 	payload = json.dumps({"brightness": brightness})
-	mqtt.publish("zigbee2mqtt/bedroom/set", payload)
-	return "", 204
+	send(payload)
+	return no_content
 
 
 @app.route("/toggle_lights")
 @app.route("/gaydar/toggle_lights")
 def toggle_lights():
-	mqtt.publish("zigbee2mqtt/bedroom/set", json.dumps({"state": "TOGGLE"}))
-	return "", 204
+	send(json.dumps({"state": "TOGGLE"}))
+	return no_content
+
+
+# === Zigbee2MQTT scene routes ===
+
+
+@app.route("/get_scenes")
+@app.route("/gaydar/get_scenes")
+def get_scenes():
+	scenes = ["scene1", "scene2"]
+	return jsonify(scenes=scenes)
 
 
 @app.route("/load_scene")
 @app.route("/gaydar/load_scene")
 def load_scene():
 	name = request.args["scene_name"]
-	return "", 204
+	return no_content
 
 
 @app.route("/save_scene")
@@ -113,4 +166,14 @@ def save_scene():
 	scene_name = request.args["scene_name"]
 	color = request.args["color"]
 	brightness = request.args["brightness"]
-	return "", 204
+	return no_content
+
+
+# === Target device control ===
+
+
+@app.route("/set_targets")
+@app.route("/gaydar/set_targets")
+def set_targets():
+	app.targets = request.args["targets"].split(",")
+	reload_configuration()

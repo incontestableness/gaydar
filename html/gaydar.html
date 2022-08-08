@@ -19,13 +19,15 @@
 	</head>
 
 	<body>
-		<h1>Controller</h1>
+		<h1>Gaydar Controller</h1>
 		<form action="/gaydar/set_color">
 			<input type="color" name="color" value="#ff0000" onchange="document.getElementById('save_color').value = this.value;">
 			<input type="submit" value="Set Color">
 		</form>
 		<form action="/gaydar/set_brightness">
-			<input type="range" name="brightness" min="0" max="254" value="254" onchange="document.getElementById('save_brightness').value = this.value;">
+			<input type="range" name="brightness" min="0" max="254" value="254"
+				onchange="document.getElementById('save_brightness').value = this.value;
+				this.parentElement.submit();">
 			<input type="submit" value="Set Brightness">
 		</form>
 		<form action="/gaydar/toggle_lights">
