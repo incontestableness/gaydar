@@ -33,6 +33,7 @@ echo -e "\nInstalling source code..."
 sudo cp -vr . /var/lib/gaydar/gaydar/
 
 echo -e "\nInstalling static content..."
+sudo mkdir /var/www/html/gaydar/ || true
 sudo cp -v ./html/* /var/www/html/gaydar/
 # Make static content read-only
 # TODO use find maybe
