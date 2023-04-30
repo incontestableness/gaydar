@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
 if [[ $UID == 0 ]]; then
 	echo "This script should not be run as root!"
