@@ -68,6 +68,10 @@ def reload_configuration(app):
 	print(f"Set targets: {app.set_targets}")
 
 
+# Set targets before first request
+reload_configuration(app)
+
+
 # === MQTT ===
 
 
