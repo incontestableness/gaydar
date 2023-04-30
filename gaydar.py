@@ -118,11 +118,11 @@ def ensure_whitelisted():
 @app.route("/")
 @cache.cached(timeout=60 * 60)
 def root():
-	return redirect(location="/index.html")
+	return redirect(location="/gaydar/index.html")
 
 
 # When run directly, we're expected to serve this file
-@app.route("/index.html")
+@app.route("/gaydar/index.html")
 def gaydar():
 	return send_from_directory("html", "index.html")
 
