@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>Gaydar Controller</title>
+		<style>
+			body {
+				background-color: black;
+				color: white;
+			}
+		</style>
 		<script>
 			fetch("/gaydar/get_scenes")
 				.then(response => response.json())
@@ -23,6 +30,22 @@
 		<form action="/gaydar/set_color">
 			<input type="color" name="color" value="#ff0000" onchange="document.getElementById('save_color').value = this.value;">
 			<input type="submit" value="Set Color">
+		</form>
+		<form action="/gaydar/set_color_temperature">
+			<!-- Default to ~5800K -->
+			<!-- TODO: Use fetch() instead of forms for iOS compatibility? -->
+			<!-- TODO: Verify color_temperature range manually -->
+			<!-- TODO: gaydar.py only needs to call scene_store instead of scene_add; but, we would like a numerical ticker to change values (sync that instead) -->
+			<input type="hidden" id="color_temperature" name="color_temperature" value="172">
+			<input type="range" id="color_temperature_slider" min="150" max="500" value="172"
+				onchange="document.getElementById('color_temperature_field').value = this.value;
+					document.getElementById('color_temperature').value = this.value;
+					this.parentElement.submit();">
+			<input type="number" id="color_temperature_field" min="150" max="500" value="172"
+				onchange="document.getElementById('color_temperature_slider').value = this.value;
+					document.getElementById('color_temperature').value = this.value;
+					this.parentElement.submit();">
+			<input type="submit" value="Set Color Temperature">
 		</form>
 		<form action="/gaydar/set_brightness">
 			<input type="range" name="brightness" min="0" max="254" value="254"

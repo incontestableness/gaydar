@@ -39,8 +39,9 @@ app.set_targets = []
 
 # Network spaces that are allowed to control the lights
 network_whitelists = [
-	netaddr.IPNetwork("127.0.0.1/32"),
-	netaddr.IPNetwork("192.168.1.0/24")
+	netaddr.IPNetwork("127.0.0.0/8"),
+	netaddr.IPNetwork("192.168.0.0/16"),
+	netaddr.IPNetwork("10.0.0.0/8")
 ]
 
 # Load groups/devices to target
@@ -128,6 +129,16 @@ def gaydar():
 def set_color():
 	color:str = request.args["color"]
 	send(json.dumps({"color": {"hex": color}}))
+	return no_content
+
+
+# really need color temp slider on gaydar...
+# I don't want to use the sengled's inverse mired scale thing
+@app.route("/set_color_temperature")
+@app.route("/gaydar/set_color_temperature")
+def set_color_temperature():
+	color_temperature:str = request.args["color_temperature"]
+	send(json.dumps({"color_temp": color_temperature}))
 	return no_content
 
 

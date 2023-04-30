@@ -17,7 +17,7 @@ parser.add_argument("-c", "--hue-change", type=int, default=45)
 parser.add_argument("--hue-min", type=int, default=0)
 parser.add_argument("--hue-max", type=int, default=360)
 parser.add_argument("--base-topic", type=str, default="zigbee2mqtt")
-parser.add_argument("-t", "--targets", type=str, default="fixture_1,fixture_2,fixture_3")
+parser.add_argument("-t", "--targets", type=str, default="fixture_1,fixture_2")
 args = parser.parse_args()
 
 # Sanity checks
