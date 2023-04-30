@@ -34,10 +34,6 @@ sudo cp -vr . /var/lib/gaydar/gaydar/
 
 echo -e "\nInstalling static content..."
 sudo cp -v ./html/* /var/www/html/gaydar/
-# Make static content owned by www-data
-echo -e "\nIs the gaydar dir owned by www-data?"
-stat /var/www/html/gaydar/
-sudo chown -vR www-data:www-data /var/www/html/gaydar/
 # Make static content read-only
 # TODO use find maybe
 #sudo chmod -v 444 /var/www/html/gaydar.html
