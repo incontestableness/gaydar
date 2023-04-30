@@ -45,6 +45,8 @@ sudo chmod -v 444 /var/www/html/gaydar/*
 
 echo -e "\nConfiguring the gaydar apache2 WSGI application..."
 sudo cp -vr WSGI/* /etc/apache2/
+echo -e "\nDisabling the default VirtualHost..."
+sudo a2dissite 000-default.conf
 echo -e "\nEnabling the gaydar WSGI application..."
 sudo a2ensite gaydar.conf
 echo -e "\nReloading apache2..."

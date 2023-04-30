@@ -121,7 +121,8 @@ def root():
 	return redirect(location="/gaydar/index.html")
 
 
-# When run directly, we're expected to serve this file
+# We're expected to serve static files ourselves
+#@app.route("/index.html")
 @app.route("/gaydar/index.html")
 def gaydar():
 	return send_from_directory("html", "index.html")
