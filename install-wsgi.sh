@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 if [[ $UID == 0 ]]; then
 	echo "This script should not be run as root!"
@@ -8,25 +8,25 @@ if [[ $UID == 0 ]]; then
 fi
 
 if [[ -z $NOAUTOINSTALL ]]; then
-	ASSUMPTION = "--assume-yes"
+	ASSUMPTION="--assume-yes"
 	echo "This script will automatically install packages via apt. --assume-yes is currently enabled!"
-	echo "You can disable this behavior by setting the \$NOAUTOINSTALL environment variable to any value."
+	echo "You can disable this behavior by setting the NOAUTOINSTALL environment variable to any value."
 else
-	ASSUMPTION = ""
+	ASSUMPTION=""
 	echo "Manual prompting by apt is enabled."
 fi
 read -p "Press enter if you know exactly what you're doing..."; echo
 
-echo -e "\nInstalling Python 3..."
+echo -e "\nInstalling Python 3 and pip..."
 sudo apt install python3 python3-pip $ASSUMPTION # python3-pip depends on python3 but whatever
 echo -e "\nInstalling apache2 and mod_wsgi..."
 sudo apt install apache2 libapache2-mod-wsgi-py3 $ASSUMPTION
 echo -e "\nInstalling system Python dependencies..."
 sudo apt install python3-flask python3-flask-caching $ASSUMPTION
-echo -e "\nInstalling system-wide python modules..."
-# pip3 install -r requirements.txt
+#echo -e "\nInstalling system-wide python modules..."
 #sudo pip3 install -r requirements.txt --target /usr/lib/python3/dist-packages --upgrade
-sudo pip3 install -r requirements.txt --upgrade
+# holy shit does this work????
+#sudo pip3 install -r requirements.txt --upgrade
 
 echo -e "\nCreating gaydar system account..."
 sudo addgroup --system gaydar
@@ -44,6 +44,7 @@ echo -e "\nIs the gaydar dir owned by www-data?"
 stat /var/www/html/gaydar/
 sudo chown -vR www-data:www-data /var/www/html/gaydar/
 # Make static content read-only
+# TODO use find maybe
 #sudo chmod -v 444 /var/www/html/gaydar.html
 sudo chmod -v 555 /var/www/html/gaydar/
 sudo chmod -v 444 /var/www/html/gaydar/*
