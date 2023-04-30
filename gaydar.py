@@ -45,8 +45,7 @@ network_whitelists = [
 ]
 
 # Load groups/devices to target
-@app.before_first_request
-def reload_configuration():
+def reload_configuration(app):
 	app.set_targets = []
 	with open("/opt/zigbee2mqtt/data/groups.yaml") as f:
 		groups = yaml.safe_load(f)
@@ -191,5 +190,5 @@ def save_scene():
 @app.route("/gaydar/set_target_names")
 def set_target_names():
 	app.targets = request.args["targets"].split(",")
-	reload_configuration()
+	reload_configuration(app)
 	return no_content
