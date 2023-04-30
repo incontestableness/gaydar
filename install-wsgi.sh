@@ -17,7 +17,7 @@ else
 fi
 read -p "Press enter if you know exactly what you're doing..."; echo
 
-echo -e "\nInstalling Python 3 and pip..."
+echo -e "Installing Python 3 and pip..."
 sudo apt install python3 python3-pip $ASSUMPTION # python3-pip depends on python3 but whatever
 echo -e "\nInstalling apache2 and mod_wsgi..."
 sudo apt install apache2 libapache2-mod-wsgi-py3 $ASSUMPTION
