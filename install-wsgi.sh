@@ -31,6 +31,8 @@ sudo adduser --system --home /var/lib/gaydar/ --ingroup gaydar gaydar
 echo -e "\nInstalling source code..."
 # This is where the WSGI application will run from
 sudo cp -vr . /var/lib/gaydar/gaydar/
+# Make source code owned by gaydar
+sudo chown -vR gaydar:gaydar /var/lib/gaydar/gaydar/
 
 echo -e "\nInstalling static content..."
 sudo mkdir /var/www/html/gaydar/ || true
