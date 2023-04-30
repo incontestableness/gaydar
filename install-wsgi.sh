@@ -33,8 +33,7 @@ echo -e "\nInstalling source code..."
 sudo cp -vr . /var/lib/gaydar/gaydar/
 
 echo -e "\nInstalling static content..."
-#sudo cp -v html/gaydar.html /var/www/html/
-sudo cp -vR ./html/ /var/www/html/gaydar/
+sudo cp -v ./html/* /var/www/html/gaydar/
 # Make static content owned by www-data
 echo -e "\nIs the gaydar dir owned by www-data?"
 stat /var/www/html/gaydar/
