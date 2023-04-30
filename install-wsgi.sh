@@ -21,12 +21,8 @@ echo -e "\nInstalling Python 3 and pip..."
 sudo apt install python3 python3-pip $ASSUMPTION # python3-pip depends on python3 but whatever
 echo -e "\nInstalling apache2 and mod_wsgi..."
 sudo apt install apache2 libapache2-mod-wsgi-py3 $ASSUMPTION
-echo -e "\nInstalling system Python dependencies..."
-sudo apt install python3-flask python3-flask-caching $ASSUMPTION
-#echo -e "\nInstalling system-wide python modules..."
-#sudo pip3 install -r requirements.txt --target /usr/lib/python3/dist-packages --upgrade
-# holy shit does this work????
-#sudo pip3 install -r requirements.txt --upgrade
+echo -e "\nInstalling system-wide Python modules..."
+sudo pip3 install -r requirements.txt
 
 echo -e "\nCreating gaydar system account..."
 sudo addgroup --system gaydar

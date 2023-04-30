@@ -4,3 +4,4 @@ flask_mqtt
 netaddr
 paho-mqtt
 pyorbital
+yaml
