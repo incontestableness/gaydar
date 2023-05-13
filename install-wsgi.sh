@@ -4,7 +4,7 @@ set -e
 
 if [[ $UID == 0 ]]; then
 	echo "This script should not be run as root!"
-	exit 1;
+	exit 1
 fi
 
 if [[ -z $NOAUTOINSTALL ]]; then
@@ -15,6 +15,7 @@ else
 	ASSUMPTION=""
 	echo "Manual prompting by apt is enabled."
 fi
+
 read -p "Press enter if you know exactly what you're doing..."; echo
 
 echo -e "Installing Python 3 and pip..."
