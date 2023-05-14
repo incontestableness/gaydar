@@ -123,6 +123,7 @@ def root():
 
 # We're expected to serve static files ourselves
 @app.route("/index.html")
+@app.route("/gaydar/index.html")
 def gaydar():
 	return send_from_directory("html", "index.html")
 
